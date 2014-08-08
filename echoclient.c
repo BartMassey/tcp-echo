@@ -20,17 +20,24 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 
+#include "echo.h"
+
 int main(int argc, char **argv) {
-    /* Create the socket. */
-    int r;
-    int s = socket(AF_INET, SOCK_STREAM, 0);
+    int r, s;
     struct sockaddr_in addr;
     char buf[512];
+
+    /* Check for proper usage. */
+    assert(argc == 3);
+
+    /* Create the socket. */
+    s = socket(AF_INET, SOCK_STREAM, 0);
     assert(s != -1);
 
     /* Connect the client to the server. */
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(2041);
+    addr.sin_port = htons(ECHO_PORT);
+    /* XXX Numeric IP address only for now. */
     r = inet_aton(argv[1], &addr.sin_addr);
     assert(r != -1);
     r = connect(s, (struct sockaddr *)&addr, sizeof(addr));

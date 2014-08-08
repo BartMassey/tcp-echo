@@ -20,6 +20,8 @@
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
 
+#include "echo.h"
+
 /* Handle a SIGCHLD by collecting the child. */
 void sigchild(int sig) {
     pid_t pid = wait(0);
@@ -27,19 +29,25 @@ void sigchild(int sig) {
     printf("Server reaped child %d\n", pid);
 }
 
-int main() {
-    /* Create a socket. */
-    int r;
+int main(int argc, char **argv) {
+    int r, s;
     struct sockaddr_in addr;
-    int s;
-    void (*sr)(int) = signal(SIGCHLD, sigchild);
+    void (*sr)(int);
+
+    /* Check for proper usage. */
+    assert(argc == 1);
+
+    /* Set up the sigchild handler. */
+    sr = signal(SIGCHLD, sigchild);
     assert(sr != SIG_ERR);
+
+    /* Create the master socket. */
     s = socket(AF_INET, SOCK_STREAM, 0);
     assert(s != -1);
 
     /* Bind the socket to an IP address. */
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(2041);
+    addr.sin_port = htons(ECHO_PORT);
     addr.sin_addr.s_addr = INADDR_ANY;
     r = bind(s, (struct sockaddr *)&addr, sizeof(addr));
     assert(r != -1);

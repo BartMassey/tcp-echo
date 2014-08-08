@@ -16,5 +16,7 @@ echoclient: echoclient.c
 echoserver: echoserver.c
 	$(CC) $(CFLAGS) -o echoserver echoserver.c
 
+echoclient echoserver: echo.h
+
 clean:
 	-rm -f $(ALL)
