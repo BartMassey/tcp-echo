@@ -21,11 +21,14 @@
 #include <arpa/inet.h>
 
 int main(int argc, char **argv) {
+    /* Create the socket. */
     int r;
     int s = socket(AF_INET, SOCK_STREAM, 0);
     struct sockaddr_in addr;
     char buf[512];
     assert(s != -1);
+
+    /* Connect the client to the server. */
     addr.sin_family = AF_INET;
     addr.sin_port = htons(2041);
     r = inet_aton(argv[1], &addr.sin_addr);
@@ -33,11 +36,16 @@ int main(int argc, char **argv) {
     r = connect(s, (struct sockaddr *)&addr, sizeof(addr));
     assert(r != -1);
     printf("Got connection...\n");
+
+    /* Write the message to the server. */
     r = write(s, argv[2], strlen(argv[2]) + 1);
     assert(r != -1);
     printf("Wrote arg...\n");
+
+    /* Read and print the echo response. */
     r = read(s, buf, 512);
     assert(r != -1);
     printf("%s\n", buf);
+
     return 0;
 }
