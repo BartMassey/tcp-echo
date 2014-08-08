@@ -57,13 +57,13 @@ int main(int argc, char **argv) {
     assert(r != -1);
 
     /* Server loop: spawn a child to handle each connection. */
-    printf("Starting server...\n");
+    fprintf(stderr, "Starting server...\n");
     while (1) {
         /* Wait for a connection. */
         int pid;
         int s0 = accept(s, 0, 0);
         assert(s0 != -1);
-        printf("Got connection...\n");
+        fprintf(stderr, "Got connection...\n");
 
         /* Fork a child to handle the connection. */
         pid = fork();
@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
         if (pid == 0) {
             /* Fork is in child process: handle connection. */
             pid = getpid();
-            printf("Child %d\n", pid);
+            fprintf(stderr, "Child %d\n", pid);
 
             /* Echo loop: Receive and retransmit characters. */
             while(1) {
@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
                 char buf[512];
                 r = read(s0, buf, sizeof(buf));
                 assert(r != -1);
-                printf("Child %d: read %d bytes\n", pid, r);
+                fprintf(stderr, "Child %d: read %d bytes\n", pid, r);
 
                 /* If the read returned no characters, the
                    connection has been closed. */
@@ -89,11 +89,11 @@ int main(int argc, char **argv) {
                 /* Transmit back the characters received. */
                 r = write(s0, buf, r);
                 assert(r != -1);
-                printf("Child %d: wrote %d bytes\n", pid, r);
+                fprintf(stderr, "Child %d: wrote %d bytes\n", pid, r);
             }
 
             /* When the other end closes, close our end. */
-            printf("Child %d: connection closed\n", pid);
+            fprintf(stderr, "Child %d: connection closed\n", pid);
             (void) close(s0);
 
             /* Exits our child process. */

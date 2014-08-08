@@ -32,6 +32,7 @@ int main(int argc, char **argv) {
 
     /* Check for proper usage. */
     assert(argc == 3);
+    assert(strlen(argv[2]) < sizeof(buf));
 
     /* Look up server address or DNS name. */
     r = snprintf(port_string, sizeof(port_string), "%d", ECHO_PORT);
@@ -46,16 +47,16 @@ int main(int argc, char **argv) {
     /* Connect the client to the server. */
     r = connect(s, ai->ai_addr, ai->ai_addrlen);
     assert(r != -1);
-    printf("Got connection...\n");
+    fprintf(stderr, "Got connection...\n");
 
     /* Write the message to the server. */
     r = write(s, argv[2], strlen(argv[2]) + 1);
     assert(r != -1);
-    printf("Wrote arg...\n");
+    fprintf(stderr, "Wrote arg...\n");
 
     /* Read and print the echo response. */
-    r = read(s, buf, 512);
-    assert(r != -1);
+    r = read(s, buf, strlen(argv[2]) + 1);
+    assert(r == strlen(argv[2]) + 1);
     printf("%s\n", buf);
 
     return 0;
