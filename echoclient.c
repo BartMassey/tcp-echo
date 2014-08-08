@@ -10,6 +10,7 @@
  */
 
 #include <assert.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -19,12 +20,14 @@
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
+#include <netdb.h>
 
 #include "echo.h"
 
 int main(int argc, char **argv) {
     int r, s;
     struct sockaddr_in addr;
+    char *addr_string;
     char buf[512];
 
     /* Check for proper usage. */
@@ -34,12 +37,24 @@ int main(int argc, char **argv) {
     s = socket(AF_INET, SOCK_STREAM, 0);
     assert(s != -1);
 
-    /* Connect the client to the server. */
+    /* Set up the server address structure. */
     addr.sin_family = AF_INET;
     addr.sin_port = htons(ECHO_PORT);
-    /* XXX Numeric IP address only for now. */
-    r = inet_aton(argv[1], &addr.sin_addr);
+    /* XXX One can just always use gethostbyname(), but
+       this code illustrates both approaches. */
+    if (isdigit(argv[1][0])) {
+        addr_string = argv[1];
+    } else {
+        /* DNS name. */
+        struct hostent *h = gethostbyname(argv[1]);
+        assert(h);
+        assert(h->h_addrtype == AF_INET);
+        addr_string = h->h_addr;
+    }
+    r = inet_aton(addr_string, &addr.sin_addr);
     assert(r != -1);
+
+    /* Connect the client to the server. */
     r = connect(s, (struct sockaddr *)&addr, sizeof(addr));
     assert(r != -1);
     printf("Got connection...\n");

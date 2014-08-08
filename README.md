@@ -14,9 +14,9 @@ Client usage:
 
             echoclient <server-ip-address> <message-to-echo>
 
-The server IP address must be given to the client
-numerically, and is usually 127.0.0.1. The server port is
-hardcoded to 2041.
+The server IP address may be given to the client numerically
+or via DNS name, and is usually localhost. The server port
+is hardcoded to 2041.
 
 This work is available under the MIT License.  Please see
 the file COPYING in this distribution for license terms.
