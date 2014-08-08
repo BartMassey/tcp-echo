@@ -26,36 +26,25 @@
 
 int main(int argc, char **argv) {
     int r, s;
-    struct sockaddr_in addr;
-    char *addr_string;
+    struct addrinfo *ai;
     char buf[512];
+    char port_string[sizeof(uint32_t) + 1];
 
     /* Check for proper usage. */
     assert(argc == 3);
 
-    /* Create the socket. */
-    s = socket(AF_INET, SOCK_STREAM, 0);
-    assert(s != -1);
-
-    /* Set up the server address structure. */
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(ECHO_PORT);
-    /* XXX One can just always use gethostbyname(), but
-       this code illustrates both approaches. */
-    if (isdigit(argv[1][0])) {
-        addr_string = argv[1];
-    } else {
-        /* DNS name. */
-        struct hostent *h = gethostbyname(argv[1]);
-        assert(h);
-        assert(h->h_addrtype == AF_INET);
-        addr_string = h->h_addr;
-    }
-    r = inet_aton(addr_string, &addr.sin_addr);
+    /* Look up server address or DNS name. */
+    r = snprintf(port_string, sizeof(port_string), "%d", ECHO_PORT);
+    assert(r < sizeof(port_string));
+    r = getaddrinfo(argv[1], port_string, 0, &ai);
     assert(r != -1);
 
+    /* Create the socket. */
+    s = socket(ai->ai_family, SOCK_STREAM, 0);
+    assert(s != -1);
+
     /* Connect the client to the server. */
-    r = connect(s, (struct sockaddr *)&addr, sizeof(addr));
+    r = connect(s, ai->ai_addr, ai->ai_addrlen);
     assert(r != -1);
     printf("Got connection...\n");
 

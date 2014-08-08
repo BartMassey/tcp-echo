@@ -31,7 +31,7 @@ void sigchild(int sig) {
 
 int main(int argc, char **argv) {
     int r, s;
-    struct sockaddr_in addr;
+    struct sockaddr_in6 addr;
     void (*sr)(int);
 
     /* Check for proper usage. */
@@ -42,13 +42,13 @@ int main(int argc, char **argv) {
     assert(sr != SIG_ERR);
 
     /* Create the master socket. */
-    s = socket(AF_INET, SOCK_STREAM, 0);
+    s = socket(AF_INET6, SOCK_STREAM, 0);
     assert(s != -1);
 
     /* Bind the socket to an IP address. */
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(ECHO_PORT);
-    addr.sin_addr.s_addr = INADDR_ANY;
+    addr.sin6_family = AF_INET6;
+    addr.sin6_port = htons(ECHO_PORT);
+    addr.sin6_addr = in6addr_any;
     r = bind(s, (struct sockaddr *)&addr, sizeof(addr));
     assert(r != -1);
 

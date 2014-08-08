@@ -16,7 +16,8 @@ Client usage:
 
 The server IP address may be given to the client numerically
 or via DNS name, and is usually localhost. The server port
-is hardcoded to 2041.
+is hardcoded to 2041. Both the client and the server can
+connect via either IPv4 or IPv6.
 
 This work is available under the MIT License.  Please see
 the file COPYING in this distribution for license terms.
